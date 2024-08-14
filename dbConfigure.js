@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.LOCAL_MONGO_URI;
 
 const connectDb = async () => {
   mongoose.set('strictQuery', true);
