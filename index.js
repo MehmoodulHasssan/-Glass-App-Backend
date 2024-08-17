@@ -56,7 +56,9 @@ io.on('connection', (socket) => {
 });
 
 //routes
-app.use('/user', require('./routes/userRouter'));
+app.use('/auth', require('./routes/authRouter'));
+app.use('/message', require('./routes/messageRouter'));
+app.use('/users', require('./routes/usersRouter'));
 
 //listening sever
 server.listen(PORT, () => {
