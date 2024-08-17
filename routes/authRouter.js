@@ -6,7 +6,7 @@ const {
   logoutHandler,
 } = require('../controllers/authControllers');
 
-authRouter.get('/login', loginHandler);
+authRouter.post('/login', loginHandler);
 authRouter.post('/signup', signupHandler);
 authRouter.post('/logout', logoutHandler);
 

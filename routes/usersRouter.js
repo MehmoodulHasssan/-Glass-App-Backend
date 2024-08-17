@@ -1,5 +1,6 @@
 const usersRouter = require('express').Router();
-const { usersHandler } = require('../controllers/usersController');
+const { getUsersForSideBar } = require('../controllers/usersControllers');
+const authenticateUser = require('../middlewares/protectRoute');
 
-usersRouter.get('/', usersHandler);
+usersRouter.get('/', authenticateUser, getUsersForSideBar);
 module.exports = usersRouter;

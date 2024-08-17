@@ -30,6 +30,7 @@ app.use(
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type'],
+    credentials: true,
   })
 );
 
@@ -56,9 +57,9 @@ io.on('connection', (socket) => {
 });
 
 //routes
-app.use('/auth', require('./routes/authRouter'));
-app.use('/message', require('./routes/messageRouter'));
-app.use('/users', require('./routes/usersRouter'));
+app.use('/api/auth', require('./routes/authRouter'));
+app.use('/api/message', require('./routes/messageRouter'));
+app.use('/api/users', require('./routes/usersRouter'));
 
 //listening sever
 server.listen(PORT, () => {

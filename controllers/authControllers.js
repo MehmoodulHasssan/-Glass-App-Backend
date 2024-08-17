@@ -15,8 +15,8 @@ const loginHandler = async (req, res) => {
   if (!user) {
     return res.status(400).json({ message: 'Your Email is not registered' });
   }
-
-  if (!comparePassword(password, user.password)) {
+  const correctPassword = await comparePassword(password, user.password);
+  if (!correctPassword) {
     return res.status(400).json({ message: 'Incorrect password' });
   }
 

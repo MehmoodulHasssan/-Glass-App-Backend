@@ -2,7 +2,7 @@ const messageRouter = require('express').Router();
 const {
   sendMessage,
   getMessages,
-} = require('../controllers/messageController');
+} = require('../controllers/messageControllers');
 const authenticateUser = require('../middlewares/protectRoute');
 
 messageRouter.post('/send/:id', authenticateUser, sendMessage);
