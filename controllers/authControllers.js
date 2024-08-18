@@ -28,7 +28,9 @@ const loginHandler = async (req, res) => {
     maxAge: 43200000, // Cookie expiration time in milliseconds
     sameSite: 'lax',
   });
-  return res.status(200).json({ message: 'Logged In', token });
+  return res
+    .status(200)
+    .json({ message: 'Logged In', token, profilePic: user.profilePic });
 };
 
 const signupHandler = async (req, res) => {
