@@ -24,15 +24,15 @@ const loginHandler = async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-    secure: true, // Ensures the cookie is sent only over HTTPS
+    secure: false, // Ensures the cookie is sent only over HTTPS
     maxAge: 43200000, // Cookie expiration time in milliseconds
+    sameSite: 'lax',
   });
-  return res.status(200).json({ message: 'Logged In' });
+  return res.status(200).json({ message: 'Logged In', token });
 };
 
 const signupHandler = async (req, res) => {
   const { email, password, username, phone, gender } = req.body;
-  console.log(req.body);
 
   const user = await User.findOne({ email: req.body.email });
   if (user) {
@@ -74,7 +74,7 @@ const signupHandler = async (req, res) => {
 
 const logoutHandler = async (req, res) => {
   try {
-    res.clearCookie('token');
+    res.clearCookie('token', { httpOnly: true, secure: false });
     return res.status(200).json({ message: 'Logged Out' });
   } catch (error) {
     return res.status(500).json({ message: error.message });

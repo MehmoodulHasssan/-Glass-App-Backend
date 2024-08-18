@@ -2,11 +2,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const authenticateUser = async (req, res, next) => {
+  // console.log(req.cookies);
   try {
     // Get the token from the Authorization header
     const token =
-      req.cookie || req.header('Authorization').replace('Bearer ', '');
+      req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
 
+    // console.log(token);
     if (!token) {
       return res
         .status(401)
@@ -17,7 +19,7 @@ const authenticateUser = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
 
     // Find the user by ID (assuming the token contains the user's ID)
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res
