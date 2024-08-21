@@ -21,11 +21,11 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    gender: {
-      type: String,
-      required: true,
-      enum: ['Male', 'Female'],
-    },
+    // gender: {
+    //   type: String,
+    //   required: true,
+    //   enum: ['Male', 'Female'],
+    // },
     profilePic: {
       type: String,
       default: '',
