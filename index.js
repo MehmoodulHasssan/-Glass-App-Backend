@@ -35,9 +35,11 @@ app.use('/api/users', require('./routes/usersRouter'));
 app.get('/api/getToken', getToken);
 
 //error handling middleware
-app.use((err, req, res, next) => {
-  if (err instanceof ApiError) {
-    return res.status(err.status).json({ message: err.message });
+app.use((error, req, res, next) => {
+  if (error instanceof ApiError) {
+    return res
+      .status(error.status)
+      .json({ status: error.status, message: error.message });
   }
   return res.status(500).json({ message: 'Internal Server Error' });
 });

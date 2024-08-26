@@ -3,11 +3,11 @@ const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
 
 const authenticateUser = async (req, res, next) => {
-  // console.log(req.cookies);
+  // console.log(req);
   try {
     // Get the token from the Authorization header
     const token =
-      req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+      req.cookies?.token || req.header('authorization')?.replace('Bearer ', '');
 
     // console.log(token);
     if (!token) {
