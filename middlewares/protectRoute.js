@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const ApiError = require('../utils/ApiError');
 
 const authenticateUser = async (req, res, next) => {
   // console.log(req.cookies);
@@ -10,9 +11,7 @@ const authenticateUser = async (req, res, next) => {
 
     // console.log(token);
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: 'No token provided, authorization denied' });
+      return next(ApiError.unauthorized('No token provided'));
     }
 
     // Verify the token
@@ -33,17 +32,19 @@ const authenticateUser = async (req, res, next) => {
     // Call the next middleware or route handler
     next();
   } catch (err) {
-    if (err.name === 'JsonWebTokenError') {
-      return res
-        .status(401)
-        .json({ message: 'Invalid token, authorization denied' });
-    } else if (err.name === 'TokenExpiredError') {
-      return res
-        .status(401)
-        .json({ message: 'Token expired, please login again' });
+    if (err instanceof ApiError) {
+      return next(err);
     } else {
-      console.error('Internal Server Error:', err);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      if (err.name === 'JsonWebTokenError') {
+        return next(
+          ApiError.unauthorized('Invalid token, authorization denied')
+        );
+      } else if (err.name === 'TokenExpiredError') {
+        return next(ApiError.unauthorized('Token expired, please login again'));
+      } else {
+        console.error(err);
+        return next(ApiError.internal('Internal Server Error'));
+      }
     }
   }
 };

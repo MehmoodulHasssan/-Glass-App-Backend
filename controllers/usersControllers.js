@@ -1,6 +1,7 @@
 const User = require('../models/User');
+const ApiError = require('../utils/ApiError');
 
-const getUsersForSideBar = async (req, res) => {
+const getUsersForSideBar = async (req, res, next) => {
   try {
     const users = await User.find({ _id: { $ne: req.user._id } }).select([
       'username',
@@ -13,7 +14,8 @@ const getUsersForSideBar = async (req, res) => {
     }
     return res.status(200).json(users);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error);
+    return next(ApiError.internal(error.message));
   }
 };
 
