@@ -15,14 +15,36 @@ connectDb();
 //Middlewares
 
 app.use(express.static('public'));
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PATCH'],
-    allowedHeaders: ['Content-Type'],
-    credentials: true,
-  })
-);
+app.use((req, res, next) => {
+  const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.5:3000'];
+  const origin = req.headers.origin;
+  console.log(origin);
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', true);
+  }
+  if (req.method === 'OPTIONS') {
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,PUT,PATCH,POST,DELETE'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization'
+    );
+    return res.status(204).end();
+  }
+  next();
+});
+
+// app.use(
+//   cors({
+//     origin: process.env.NEXT_PUBLIC_API_DOMAIN,
+//     methods: ['GET', 'POST', 'PATCH'],
+//     allowedHeaders: ['Content-Type'],
+//     credentials: true,
+//   })
+// );
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

@@ -10,6 +10,7 @@ const storage = require('../utils/cloudinaryConfig');
 const { app } = require('../socket/socket');
 const multer = require('multer');
 const ApiError = require('../utils/ApiError');
+const generateAccessTokenandRefreshToken = require('../utils/generateTokens');
 dotenv.config();
 
 const loginHandler = async (req, res, next) => {
@@ -18,27 +19,27 @@ const loginHandler = async (req, res, next) => {
 
     const user = await User.findOne({ email: email });
     if (!user) {
-      console.log('errored');
-      // return res.status(400).json({ message: 'Your Email is not registered' });
       throw ApiError.badRequest('Your Email is not registered');
     }
     const correctPassword = await comparePassword(password, user.password);
     if (!correctPassword) {
-      // return res.status(400).json({ message: 'Incorrect password' });
       throw ApiError.badRequest('Incorrect password');
     }
+    const { accessToken, refreshToken } =
+      await generateAccessTokenandRefreshToken(user._id);
+    // const token = generateToken(user);
 
-    const token = generateToken(user);
-
-    res.cookie('token', token, {
+    const options = {
       httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
       secure: false, // Ensures the cookie is sent only over HTTPS
-      maxAge: 43200000, // Cookie expiration time in milliseconds
       sameSite: 'lax',
-    });
+    };
+    res
+      .cookie('accessToken', accessToken, options)
+      .cookie('refreshToken', refreshToken, options);
     return res
       .status(200)
-      .json({ message: 'Logged In', token, profilePic: user.profilePic });
+      .json({ message: 'Logged In', accessToken, profilePic: user.profilePic });
   } catch (error) {
     console.log(error);
     if (error instanceof ApiError) {
@@ -155,7 +156,9 @@ const signupHandler = async (req, res, next) => {
 
 const logoutHandler = async (req, res, next) => {
   try {
-    res.clearCookie('token', { httpOnly: true, secure: false });
+    ['accessToken', 'refreshToken'].forEach((cookie) =>
+      res.clearCookie(cookie, { httpOnly: true, secure: false })
+    );
     return res.status(200).json({ message: 'Logged Out' });
   } catch (error) {
     console.log(error);
