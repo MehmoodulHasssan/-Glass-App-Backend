@@ -5,9 +5,10 @@ const {
   signupHandler,
   logoutHandler,
 } = require('../controllers/authControllers');
+const authenticateUser = require('../middlewares/authMiddleware');
 
 authRouter.post('/login', loginHandler);
 authRouter.post('/signup', signupHandler);
-authRouter.post('/logout', logoutHandler);
+authRouter.post('/logout', authenticateUser, logoutHandler);
 
 module.exports = authRouter;

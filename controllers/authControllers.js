@@ -156,7 +156,10 @@ const signupHandler = async (req, res, next) => {
 
 const logoutHandler = async (req, res, next) => {
   try {
-    ['accessToken', 'refreshToken'].forEach((cookie) =>
+    req.user.refreshToken = undefined;
+    await req.user.save();
+    const tokensNames = ['accessToken', 'refreshToken'];
+    tokensNames.forEach((cookie) =>
       res.clearCookie(cookie, { httpOnly: true, secure: false })
     );
     return res.status(200).json({ message: 'Logged Out' });
