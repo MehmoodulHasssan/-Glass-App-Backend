@@ -18,7 +18,7 @@ app.use(express.static('public'));
 app.use((req, res, next) => {
   const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.5:3000'];
   const origin = req.headers.origin;
-  console.log(origin);
+  // console.log(origin);
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', true);

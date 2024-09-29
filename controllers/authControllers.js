@@ -1,16 +1,10 @@
-const User = require('../models/User');
-const {
-  generateToken,
-  verifyToken,
-  hashPassword,
-  comparePassword,
-} = require('../utils/authUtils');
 const dotenv = require('dotenv');
 const storage = require('../utils/cloudinaryConfig');
 const { app } = require('../socket/socket');
 const multer = require('multer');
 const ApiError = require('../utils/ApiError');
 const generateAccessTokenandRefreshToken = require('../utils/generateTokens');
+const User = require('../models/user');
 dotenv.config();
 
 const loginHandler = async (req, res, next) => {
@@ -21,7 +15,7 @@ const loginHandler = async (req, res, next) => {
     if (!user) {
       throw ApiError.badRequest('Your Email is not registered');
     }
-    const correctPassword = await comparePassword(password, user.password);
+    const correctPassword = user.comparePassword(password);
     if (!correctPassword) {
       throw ApiError.badRequest('Incorrect password');
     }
@@ -125,15 +119,13 @@ const signupHandler = async (req, res, next) => {
         throw ApiError.badRequest('Your Email is already registered');
       }
 
-      const hashedPassword = await hashPassword(password);
-
       let profilePicUrl = req.file ? req.file.path : null;
 
       const newUser = new User({
         username,
         email,
         phone,
-        password: hashedPassword,
+        password,
         profilePic:
           profilePicUrl ||
           `https://avatar.iran.liara.run/public/boy?username=${username}`, // Default avatar

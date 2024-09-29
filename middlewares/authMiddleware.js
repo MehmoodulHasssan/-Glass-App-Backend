@@ -1,17 +1,22 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
+const User = require('../models/user');
 
 const authenticateUser = async (req, res, next) => {
   try {
     // Get the token from the Authorization header
+    // console.log(req.header('authorization'));
     const accessToken =
       req.cookies?.accessToken ||
       req.header('authorization')?.replace('Bearer ', '');
     // const refreshToken = req.cookies?.refreshToken;
-    const refreshToken = req.header('x-refresh-token');
+    const refreshToken =
+      req.cookies?.refreshToken || req.header('x-refresh-token');
+
+    // console.log(accessToken);
 
     if (!accessToken && !refreshToken) {
+      console.log('errored');
       throw ApiError.unauthorized('No token provided');
     }
 
@@ -27,10 +32,14 @@ const authenticateUser = async (req, res, next) => {
 
     // Defining cusotm function for refreshing the access token
     const refreshTokens = async (refreshToken) => {
+      // console.log(accessToken);
+      console.log('refreshingToken');
       const decoded = jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET
       );
+
+      // console.log(decoded);
       // Fetch user and verify the refresh token
       const user = await User.findById(decoded._id);
       if (!user || user.refreshToken !== refreshToken) {
@@ -47,13 +56,17 @@ const authenticateUser = async (req, res, next) => {
       req.user = user;
       next();
     };
+
+    //now starting teh process of adding flags and executing atuthentication
     if (accessToken) {
       try {
+        // console.log('accessToken');
         const decoded = jwt.verify(
           accessToken,
           process.env.ACCESS_TOKEN_SECRET
         );
-        // console.log(decoded);
+        console.log(decoded);
+
         await setUserAndContinue(decoded._id);
       } catch (err) {
         if (err.name === 'JsonWebTokenError') {
@@ -61,12 +74,14 @@ const authenticateUser = async (req, res, next) => {
             ApiError.unauthorized('Invalid token, authorization denied')
           );
         } else if (err.name === 'TokenExpiredError') {
+          console.log('access token expired');
           await refreshTokens(refreshToken);
         } else {
           throw ApiError.unauthorized('Internal Server Error');
         }
       }
     } else if (refreshToken) {
+      console.log(accessToken);
       await refreshTokens(refreshToken);
     }
   } catch (err) {

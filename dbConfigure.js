@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const uri = process.env.LOCAL_MONGO_URI;
+const uri = process.env.MONGODB_URI;
 
 const connectDb = async () => {
   mongoose.set('strictQuery', true);
@@ -10,9 +10,12 @@ const connectDb = async () => {
     await mongoose.connect(uri);
 
     const connection = mongoose.connection;
-    connection.on('connected', () => {
-      console.log('mongodb is connected');
+    mongoose.connection.once('open', () => {
+      console.log('Mongo connected...');
     });
+    // connection.on('connected', () => {
+    //   console.log('mongodb is connected');
+    // });
     // console.log('Mongo connected...');
     connection.on('error', (error) => {
       console.log('Error connecting with mongoDb ' + error);
