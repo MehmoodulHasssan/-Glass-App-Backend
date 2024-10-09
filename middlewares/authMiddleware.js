@@ -48,7 +48,7 @@ const authenticateUser = async (req, res, next) => {
 
       // Generate only a new access token
       const accessToken = user.generateAccessToken();
-      res.cookies('accessToken', accessToken, {
+      res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'lax',
@@ -65,7 +65,7 @@ const authenticateUser = async (req, res, next) => {
           accessToken,
           process.env.ACCESS_TOKEN_SECRET
         );
-        console.log(decoded);
+        // console.log(decoded);
 
         await setUserAndContinue(decoded._id);
       } catch (err) {
@@ -81,7 +81,7 @@ const authenticateUser = async (req, res, next) => {
         }
       }
     } else if (refreshToken) {
-      console.log(accessToken);
+      // console.log(accessToken);
       await refreshTokens(refreshToken);
     }
   } catch (err) {

@@ -29,19 +29,28 @@ io.on('connection', (socket) => {
   console.log('A user connected', socket.id);
 
   const token = socket.handshake.query.token;
+  // console.log('Token:', token);
   if (!token) {
     return socket.disconnect();
   }
   try {
-    const { userId } = jwt.verify(token, process.env.TOKEN_KEY);
-    if (userId) {
-      onlineUsers.push({ userId, socketId: socket.id });
+    console.log(
+      'Access Token: ',
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+    );
+    const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    if (_id) {
+      const alreadyOnline = onlineUsers.find((user) => user.userId === _id);
+      if (!alreadyOnline) {
+        onlineUsers.push({ userId: _id, socketId: socket.id });
+      }
     }
   } catch (error) {
     console.error('Token verification failed:', error.message);
     return socket.disconnect();
   }
 
+  console.log(onlineUsers);
   // Emit the updated list of online users to all clients
   io.emit('online-users', onlineUsers);
 

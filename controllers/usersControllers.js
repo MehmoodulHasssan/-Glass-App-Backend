@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/user');
 const ApiError = require('../utils/ApiError');
 
 const getUsersForSideBar = async (req, res, next) => {
